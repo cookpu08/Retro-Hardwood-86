@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Retro Hardwood '86</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c1f17; --panel:#102a1e; --line:#2f6b45; --text:#9df7b0; --text-dim:#5fa876;
+  --accent:#ffcc33; --accent2:#ff5555; --court:#1a3d28;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#e8f3ea; --panel:#d3ead9; --line:#5a9e73; --text:#0e3d1f; --text-dim:#3d7050;
+    --accent:#b5790a; --accent2:#b93b3b; --court:#c3e3cc;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1f17; --panel:#102a1e; --line:#2f6b45; --text:#9df7b0; --text-dim:#5fa876;
+  --accent:#ffcc33; --accent2:#ff5555; --court:#1a3d28;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'Press Start 2P', monospace; font-size:12px; line-height:1.6;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  display:flex; justify-content:center;
+}
+#wrap{ width:100%; max-width:480px; padding:16px; }
+h1{ font-size:16px; color:var(--accent); text-align:center; letter-spacing:1px; margin:8px 0 4px; text-shadow:2px 2px 0 #000;}
+.sub{ text-align:center; color:var(--text-dim); font-size:8px; margin-bottom:16px; }
+.panel{ background:var(--panel); border:3px solid var(--line); border-radius:4px; padding:14px; margin-bottom:14px; }
+.row{ display:flex; justify-content:space-between; align-items:center; margin:6px 0; font-size:10px; }
+input[type=text]{
+  width:100%; background:#000; color:var(--text); border:2px solid var(--line);
+  font-family:inherit; font-size:11px; padding:8px; border-radius:2px;
+}
+button{
+  font-family:inherit; font-size:10px; background:var(--court); color:var(--text);
+  border:2px solid var(--line); border-radius:2px; padding:10px 8px; cursor:pointer;
+  width:100%; margin-top:8px; letter-spacing:1px;
+}
+button:active{ transform:translateY(1px); }
+button:disabled{ opacity:.4; }
+button.primary{ background:var(--accent); color:#1a1200; border-color:var(--accent); }
+button.danger{ background:var(--accent2); color:#2a0000; border-color:var(--accent2); }
+.plays{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.score{ display:flex; justify-content:space-between; font-size:20px; color:var(--accent); margin:10px 0; text-shadow:1px 1px 0 #000; }
+.score div{ flex:1; text-align:center; }
+.vs{ font-size:10px; color:var(--text-dim); }
+.log{ background:#000; border:2px solid var(--line); border-radius:2px; padding:8px; height:90px; overflow-y:auto; font-size:9px; color:var(--text-dim); }
+.log div{ margin:2px 0; }
+.sched{ font-size:8px; max-height:280px; overflow-y:auto; }
+.sched .g{ display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dashed var(--line); gap:6px; }
+.sched .w{ color:var(--accent); } .sched .l{ color:var(--accent2); }
+.center{ text-align:center; }
+.hide{ display:none !important; }
+.meter{ background:#000; border:2px solid var(--line); border-radius:2px; height:16px; margin:8px 0; overflow:hidden; }
+.meter-fill{ height:100%; background:var(--accent); width:0%; transition:width .05s linear; }
+footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>&#127936; RETRO HARDWOOD '86</h1>
+  <div class="sub">64 teams &middot; weekly top 25 &middot; conf. tourney &middot; playoffs &middot; FR-SO-JR-SR recruiting</div>
+
+  <div id="setup" class="panel">
+    <div class="row">ENTER YOUR SCHOOL</div>
+    <input id="teamName" type="text" maxlength="18" placeholder="e.g. CORPUS CREEK TECH">
+    <button class="primary" id="startBtn">TIP OFF SEASON</button>
+  </div>
+
+  <div id="hub" class="panel hide">
+    <div class="row"><span id="hubTeam"></span><span id="hubRecord"></span></div>
+    <div class="sched" id="schedList"></div>
+    <button class="primary" id="playNextBtn">PLAY NEXT GAME</button>
+    <button class="primary hide" id="confBtn">PLAY CONFERENCE TOURNAMENT</button>
+    <button class="primary hide" id="playoffBtn">ENTER THE PLAYOFFS</button>
+    <button class="primary hide" id="goRecruitBtn">GO TO RECRUITING</button>
+    <button class="hide" id="top25Btn">VIEW TOP 25</button>
+    <button id="rosterBtn">VIEW ROSTER</button>
+    <button class="danger" id="resetBtn">RESET SEASON</button>
+  </div>
+
+  <div id="top25Screen" class="panel hide">
+    <div class="center" style="color:var(--accent);font-size:12px;margin-bottom:2px;" id="top25Title">TOP 25</div>
+    <div class="center" style="color:var(--text-dim);font-size:8px;margin-bottom:8px;" id="top25Sub"></div>
+    <div class="sched" id="top25List"></div>
+    <button class="primary" id="top25BackBtn">BACK</button>
+  </div>
+
+  <div id="rosterScreen" class="panel hide">
+    <div class="center" style="color:var(--accent);font-size:12px;margin-bottom:8px;" id="rosterTitle">ROSTER</div>
+    <div class="sched" id="rosterList"></div>
+    <button class="primary" id="rosterBackBtn">BACK</button>
+  </div>
+
+  <div id="recruitScreen" class="panel hide">
+    <div class="center" style="color:var(--accent);font-size:12px;margin-bottom:4px;">OFFSEASON RECRUITING</div>
+    <div class="center" style="color:var(--text-dim);font-size:8px;margin-bottom:8px;" id="recruitSub">SIGN YOUR CLASS</div>
+    <div class="sched" id="recruitList"></div>
+    <div class="center" id="recruitCount" style="margin-top:8px;font-size:9px;color:var(--text-dim);">0 SIGNED</div>
+    <button class="primary" id="confirmRecruitsBtn" disabled>CONFIRM RECRUITING CLASS</button>
+  </div>
+
+  <div id="game" class="panel hide">
+    <div class="vs center" id="matchup"></div>
+    <div class="score">
+      <div id="scoreHome">0</div><div class="vs">-</div><div id="scoreAway">0</div>
+    </div>
+    <div class="center vs" id="possInfo">POSSESSION 1 / 20</div>
+    <div class="meter"><div class="meter-fill" id="meter"></div></div>
+    <div class="plays" id="playButtons">
+      <button data-play="inside">INSIDE POST</button>
+      <button data-play="outside">MID-RANGE</button>
+      <button data-play="three">LONG BOMB</button>
+      <button data-play="fast">FAST BREAK</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div id="result" class="panel hide">
+    <div class="center" id="resultTitle" style="font-size:14px;color:var(--accent);"></div>
+    <div class="center vs" id="resultScore" style="margin:10px 0;"></div>
+    <button class="primary" id="continueBtn">CONTINUE SEASON</button>
+  </div>
+
+  <footer>tap a play each possession &middot; outcome is weighted by risk &amp; roster</footer>
+</div>
+
+<script>
+(function(){
+  const CONFERENCES = {
+    "ATLANTIC CONFERENCE": ["RIVER CITY A&M","GULF COAST ST.","PINE BLUFF U.","IRON RANGE TECH","SALT FLATS COLLEGE","CANYON STATE","DUSTBOWL U.","HARBOR POINT","GRANITE VALLEY"],
+    "GULF CONFERENCE": ["CYPRESS A&M","RUSTBELT TECH","PRAIRIE WIND U.","COASTAL PINES","REDROCK STATE","MAPLE RIDGE","SUNBELT CENTRAL","TIMBERLINE U.","BAYOU CHRISTIAN","FRONTIER STATE"],
+    "MOUNTAIN CONFERENCE": ["LONE PEAK","MIDLAND TECH","OZARK BAPTIST","SILVER CREEK","BLUFF CITY","NORTHGATE U.","DELTA JUNCTION","STONE HARBOR","WINDRIDGE COLLEGE","CACTUS STATE"],
+    "PRAIRIE CONFERENCE": ["EVERGREEN TECH","STORM LAKE","IRONWOOD U.","CRESTVIEW STATE","HOLLOW CREEK U.","AMBER PLAINS","COPPER BASIN","WHITEWATER TECH","FOGGY RIDGE","SANDSTONE U."],
+    "TIMBER CONFERENCE": ["CLEARWATER CHRISTIAN","HIGHGATE COLLEGE","QUARRY HILL","PALMETTO A&M","BROKEN ARROW ST.","VALLEY FORGE TECH","RED CEDAR U.","KINGSTON BAPTIST"],
+    "DESERT CONFERENCE": ["NORTHWIND STATE","STARLIGHT COLLEGE","BIG SKY CENTRAL","EASTGATE U.","WOLF CREEK TECH","AMBERLY STATE","THUNDER BASIN","SOUTHPORT A&M"],
+    "COASTAL CONFERENCE": ["CRIMSON HOLLOW","FOXFIELD COLLEGE","GOLDEN PLAINS","IRONGATE TECH","WHISPERING PINES","CEDARBROOK U.","SLATE RIVER","HARTLAND CHRISTIAN"]
+  };
+  const USER_CONFERENCE = "ATLANTIC CONFERENCE";
+  const TEAM_NAMES = Object.values(CONFERENCES).flat();
+  const SEASON_GAMES = 13;
+  const CONF_ROUND_LABELS = ["CONF. QUARTERFINAL", "CONF. SEMIFINAL", "CONF. CHAMPIONSHIP"];
+  const PLAYOFF_ROUNDS_FULL = ["ROUND OF 32", "ROUND OF 16", "QUARTERFINAL", "SEMIFINAL", "CHAMPIONSHIP"];
+  const ARCHETYPES = [
+    {style:"POST BRUISERS", mods:{inside:0.08, outside:-0.02, three:-0.06, fast:-0.03}},
+    {style:"RUN & GUN", mods:{fast:0.10, inside:-0.03, outside:-0.02, three:-0.02}},
+    {style:"SHARPSHOOTERS", mods:{three:0.12, inside:-0.05, outside:0.02, fast:-0.04}},
+    {style:"GRIND IT OUT", mods:{outside:0.08, fast:-0.08, inside:0.02, three:-0.03}},
+    {style:"BOMB SQUAD", mods:{three:0.15, fast:-0.05, inside:-0.04, outside:-0.03}},
+    {style:"BALANCED ATTACK", mods:{inside:0.02, outside:0.02, three:0.02, fast:0.02}},
+    {style:"FAST BREAK DEMONS", mods:{fast:0.12, outside:-0.04, inside:-0.02, three:-0.03}},
+    {style:"PAINT BEASTS", mods:{inside:0.10, three:-0.06, outside:-0.02, fast:-0.01}}
+  ];
+  function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i)) >>> 0; } return h; }
+  function getProfile(name){
+    const arche = ARCHETYPES[hashStr(name) % ARCHETYPES.length];
+    const variance = ((hashStr(name+'_v') % 5) - 2) * 0.01;
+    const mods = {};
+    Object.keys(PLAYS).forEach(k => { mods[k] = (arche.mods[k]||0) + variance; });
+    return { style: arche.style, mods };
+  }
+  const PLAYS = {
+    inside:{label:"INSIDE POST", chance:0.62, pts:2},
+    outside:{label:"MID-RANGE", chance:0.48, pts:2},
+    three:{label:"LONG BOMB", chance:0.44, pts:3},
+    fast:{label:"FAST BREAK", chance:0.40, pts:2}
+  };
+  const POSSESSIONS = 20;
+  const OT_LENGTH = 5;
+
+  const CLASS_ORDER = ['FR','SO','JR','SR'];
+  const ARCHETYPE_PRIMARY = {
+    "SHARPSHOOTER": {three:1},
+    "COURT GENERAL": {outside:1},
+    "BALLHAWK": {fast:1},
+    "PAINT PRODIGY": {inside:1},
+    "SCORING SAVANT": {inside:0.5, outside:0.5, three:0.5, fast:0.5}
+  };
+  const RECRUIT_ARCHETYPES = Object.keys(ARCHETYPE_PRIMARY);
+  const FIRST_NAMES = ["JALEN","MARCUS","TYRELL","DESHAWN","BRADY","COLE","ISAIAH","DOMINIC","ELIJAH","TREVOR","AUSTIN","MALIK","XAVIER","HUNTER","JORDAN","CALEB","DEVIN","TYSON","LUCAS","OMAR"];
+  const LAST_NAMES = ["WASHINGTON","CARTER","MITCHELL","HAYES","REYES","BENNETT","COLEMAN","PARKER","SIMMONS","BOYD","FOSTER","PRICE","WARD","HUNT","BARNES","GRAY","FLETCHER","DUNN","WEBB","CROSS"];
+
+  function randomStars(){
+    const r = Math.random();
+    if(r<0.04) return 5;
+    if(r<0.18) return 4;
+    if(r<0.55) return 3;
+    if(r<0.85) return 2;
+    return 1;
+  }
+  function overallRating(stars){
+    const base = 35 + stars*11 + Math.floor(Math.random()*15) - 5;
+    return Math.max(1, Math.min(99, base));
+  }
+  function randomPlayer(used){
+    let name;
+    do{ name = FIRST_NAMES[Math.floor(Math.random()*FIRST_NAMES.length)] + ' ' + LAST_NAMES[Math.floor(Math.random()*LAST_NAMES.length)]; } while(used.includes(name));
+    used.push(name);
+    const heightIn = 70 + Math.floor(Math.random()*15);
+    const weightLb = Math.round(155 + (heightIn-70)*4 + (Math.random()*30-15));
+    const archetype = RECRUIT_ARCHETYPES[Math.floor(Math.random()*RECRUIT_ARCHETYPES.length)];
+    const stars = randomStars();
+    return { name, stars, overall: overallRating(stars), heightIn, weightLb, archetype, class:'FR' };
+  }
+  function heightStr(inches){ return Math.floor(inches/12) + "'" + (inches%12) + '"'; }
+  function starStr(n){ return '\u2605'.repeat(n) + '\u2606'.repeat(5-n); }
+  function generateRoster(){
+    const used=[]; const r=[];
+    for(let i=0;i<5;i++){ const p = randomPlayer(used); p.class='SR'; r.push(p); }
+    return r;
+  }
+  function generateRecruitClass(){ const used=[]; const r=[]; for(let i=0;i<10;i++){ r.push(randomPlayer(used)); } return r; }
+  function rosterBonus(){
+    const b = {inside:0, outside:0, three:0, fast:0};
+    (state.roster||[]).forEach(p=>{
+      const prim = ARCHETYPE_PRIMARY[p.archetype] || {};
+      const mult = (p.overall||70) / 70;
+      Object.keys(prim).forEach(k=>{ b[k] += prim[k]*p.stars*0.01*mult; });
+    });
+    return b;
+  }
+
+  let state = load() || null;
+  let gs = null;
+
+  const $ = id => document.getElementById(id);
+  const setup=$('setup'), hub=$('hub'), gameEl=$('game'), resultEl=$('result'), top25Screen=$('top25Screen'), rosterScreen=$('rosterScreen'), recruitScreen=$('recruitScreen');
+
+  function save(){ try{ localStorage.setItem('retroCBB', JSON.stringify(state)); }catch(e){} }
+  function load(){ try{ const r=localStorage.getItem('retroCBB'); return r?JSON.parse(r):null; }catch(e){ return null; } }
+
+  function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  function makeResultSeq(games){ const seq=[]; for(let i=0;i<games;i++){ seq.push(Math.random()<0.5); } return seq; }
+  function teamWinsThroughWeek(team, week){
+    const seq = state.leagueResults[team] || [];
+    let w = 0;
+    for(let i=0;i<week && i<seq.length;i++){ if(seq[i]) w++; }
+    return w;
+  }
+  function userWinsThroughWeek(week){
+    let w = 0;
+    for(let i=0;i<week && i<state.schedule.length;i++){ if(state.schedule[i].result==='W') w++; }
+    return w;
+  }
+  function computeRankingAtWeek(week){
+    const all = TEAM_NAMES.map(t=>({name:t, wins: teamWinsThroughWeek(t, week)}));
+    all.push({name: state.team, wins: userWinsThroughWeek(week)});
+    all.sort((a,b)=> b.wins - a.wins || (Math.random()-0.5));
+    const userRank = all.findIndex(e=>e.name===state.team) + 1;
+    return { top25: all.slice(0,25), userRank, week };
+  }
+  function conferenceSeed(){
+    const confTeams = CONFERENCES[USER_CONFERENCE].map(t=>({name:t, wins: teamWinsThroughWeek(t, SEASON_GAMES)}));
+    confTeams.push({name: state.team, wins: state.wins});
+    confTeams.sort((a,b)=> b.wins - a.wins || (Math.random()-0.5));
+    return confTeams.findIndex(t=>t.name===state.team) + 1;
+  }
+  function isQualified(){
+    return !!state.conf.champion || (state.rankingInfo && state.rankingInfo.userRank <= 25);
+  }
+
+  function buildSeasonFields(){
+    const confMates = CONFERENCES[USER_CONFERENCE].slice();
+    const others = TEAM_NAMES.filter(t => !confMates.includes(t));
+    const nonConf = shuffle(others).slice(0, SEASON_GAMES - confMates.length);
+    const seasonOpponents = shuffle(confMates.concat(nonConf));
+    const leagueResults = {};
+    TEAM_NAMES.forEach(t=>{ leagueResults[t] = makeResultSeq(SEASON_GAMES); });
+    return {
+      schedule: seasonOpponents.map(o=>({opp:o, played:false, result:null, us:0, them:0})),
+      leagueResults: leagueResults
+    };
+  }
+
+  function newSeason(name){
+    const f = buildSeasonFields();
+    state = {
+      team:name, year:1,
+      roster: generateRoster(),
+      wins:0, losses:0,
+      schedule: f.schedule, current:0,
+      leagueResults: f.leagueResults,
+      rankingInfo: null,
+      conf: { started:false, seed:null, round:0, eliminated:false, champion:false, usedOpponents:[] },
+      playoffs: { started:false, round:0, eliminated:false, champion:false, opponents:null, labels:null, bye:false },
+      recruits: null, selected: [], pendingVacancies: 0
+    };
+    save();
+  }
+
+  function startNextSeasonKeepingRoster(){
+    const f = buildSeasonFields();
+    state.wins=0; state.losses=0;
+    state.schedule = f.schedule; state.current = 0;
+    state.leagueResults = f.leagueResults;
+    state.rankingInfo = null;
+    state.conf = { started:false, seed:null, round:0, eliminated:false, champion:false, usedOpponents:[] };
+    state.playoffs = { started:false, round:0, eliminated:false, champion:false, opponents:null, labels:null, bye:false };
+    state.recruits = null; state.selected = []; state.pendingVacancies = 0;
+    save();
+  }
+
+  function advanceOffseason(){
+    const staying = state.roster.filter(p=>p.class !== 'SR');
+    const numGrad = state.roster.length - staying.length;
+    const promoted = staying.map(p=> Object.assign({}, p, { class: CLASS_ORDER[CLASS_ORDER.indexOf(p.class)+1] }));
+    state.roster = promoted;
+    state.pendingVacancies = numGrad;
+    save();
+    if(numGrad > 0){
+      enterRecruiting();
+    } else {
+      state.year++;
+      startNextSeasonKeepingRoster();
+      renderHub();
+    }
+  }
+
+  function showScreen(which){
+    [setup,hub,gameEl,resultEl,top25Screen,rosterScreen,recruitScreen].forEach(s=>s.classList.add('hide'));
+    which.classList.remove('hide');
+  }
+
+  function renderTop25(){
+    const week = state.current;
+    const info = computeRankingAtWeek(week);
+    $('top25Title').textContent = (week >= SEASON_GAMES) ? 'FINAL TOP 25' : 'TOP 25';
+    $('top25Sub').textContent = (week >= SEASON_GAMES) ? 'END OF REGULAR SEASON' : ('THROUGH WEEK ' + week + ' OF ' + SEASON_GAMES);
+    const listEl = $('top25List');
+    listEl.innerHTML = '';
+    info.top25.forEach((e,i)=>{
+      const div = document.createElement('div');
+      div.className = 'g';
+      const mine = e.name === state.team;
+      div.innerHTML = '<span style="'+(mine?'color:var(--accent);':'')+'">#'+(i+1)+' '+e.name+(mine?' (YOU)':'')+'</span><span>'+e.wins+'-'+(week-e.wins)+'</span>';
+      listEl.appendChild(div);
+    });
+    if(info.userRank > 25){
+      const d = document.createElement('div');
+      d.className='center'; d.style.color='var(--text-dim)'; d.style.fontSize='9px'; d.style.marginTop='6px';
+      d.textContent = 'YOU: #' + info.userRank + ' (JUST OUTSIDE)';
+      listEl.appendChild(d);
+    }
+    showScreen(top25Screen);
+  }
+
+  function renderRoster(){
+    $('rosterTitle').textContent = 'YEAR ' + state.year + ' ROSTER';
+    const listEl = $('rosterList');
+    listEl.innerHTML = '';
+    state.roster.forEach(p=>{
+      const div = document.createElement('div');
+      div.className = 'g';
+      div.innerHTML = '<span>['+p.class+'] '+starStr(p.stars)+' OVR '+p.overall+' '+p.name+'<br>'+p.archetype+' &middot; '+heightStr(p.heightIn)+' '+p.weightLb+'lb</span>';
+      listEl.appendChild(div);
+    });
+    showScreen(rosterScreen);
+  }
+
+  function enterRecruiting(){
+    if(!state.recruits){ state.recruits = generateRecruitClass(); state.selected = []; save(); }
+    renderRecruitScreen();
+  }
+  function toggleRecruit(i){
+    const idx = state.selected.indexOf(i);
+    if(idx>=0){ state.selected.splice(idx,1); }
+    else if(state.selected.length < state.pendingVacancies){ state.selected.push(i); }
+    save();
+    renderRecruitScreen();
+  }
+  function renderRecruitScreen(){
+    $('recruitSub').textContent = state.pendingVacancies + ' SENIOR' + (state.pendingVacancies===1?'':'S') + ' GRADUATED - SIGN ' + state.pendingVacancies + ' OF 10 AS FRESHMEN';
+    const listEl = $('recruitList');
+    listEl.innerHTML = '';
+    state.recruits.forEach((p,i)=>{
+      const picked = state.selected.includes(i);
+      const div = document.createElement('div');
+      div.className = 'g';
+      div.style.cursor = 'pointer';
+      if(picked) div.style.color = 'var(--accent)';
+      div.innerHTML = '<span>'+(picked?'[X] ':'[ ] ')+starStr(p.stars)+' OVR '+p.overall+' '+p.name+'<br>'+p.archetype+' &middot; '+heightStr(p.heightIn)+' '+p.weightLb+'lb</span>';
+      div.addEventListener('click', ()=> toggleRecruit(i));
+      listEl.appendChild(div);
+    });
+    $('recruitCount').textContent = state.selected.length + ' / ' + state.pendingVacancies + ' SIGNED';
+    $('confirmRecruitsBtn').disabled = state.selected.length !== state.pendingVacancies;
+    showScreen(recruitScreen);
+  }
+
+  function renderHub(){
+    $('hubTeam').textContent = state.team + ' (YR ' + state.year + ')';
+    $('hubRecord').textContent = state.wins+'-'+state.losses;
+    const list = $('schedList');
+    list.innerHTML = '';
+    state.schedule.forEach((g,i)=>{
+      const div = document.createElement('div');
+      div.className = 'g';
+      const prof = getProfile(g.opp);
+      let status = 'vs ' + g.opp + (prof ? ' - ' + prof.style : '');
+      let resTxt = g.played ? (g.result==='W' ? 'W '+g.us+'-'+g.them : 'L '+g.us+'-'+g.them) : (i===state.current? 'NEXT' : '--');
+      div.innerHTML = '<span>'+status+'</span><span class="'+(g.result==='W'?'w':g.result==='L'?'l':'')+'">'+resTxt+'</span>';
+      list.appendChild(div);
+    });
+
+    const allDone = state.current >= state.schedule.length;
+    $('playNextBtn').style.display = allDone ? 'none' : 'block';
+    const confBtn = $('confBtn'), playoffBtn = $('playoffBtn'), top25Btn = $('top25Btn'), goRecruitBtn = $('goRecruitBtn');
+    confBtn.classList.add('hide'); playoffBtn.classList.add('hide'); goRecruitBtn.classList.add('hide'); top25Btn.classList.add('hide');
+
+    if(state.current >= 1){
+      top25Btn.classList.remove('hide');
+      top25Btn.textContent = allDone ? 'VIEW FINAL TOP 25' : 'VIEW TOP 25 (WEEK ' + state.current + ')';
+    }
+
+    if(allDone){
+      if(!state.rankingInfo){ state.rankingInfo = computeRankingAtWeek(SEASON_GAMES); save(); }
+
+      const title = state.wins > state.losses ? 'REGULAR SEASON COMPLETE - WINNING RECORD!' : 'REGULAR SEASON COMPLETE';
+      const d = document.createElement('div');
+      d.className = 'center'; d.style.marginTop='10px'; d.style.color='var(--accent)'; d.style.fontSize='10px';
+      d.textContent = title + ' (' + state.wins + '-' + state.losses + ')';
+      list.appendChild(d);
+
+      const d4 = document.createElement('div');
+      d4.className='center'; d4.style.color='var(--text-dim)'; d4.style.fontSize='9px'; d4.style.marginTop='4px';
+      d4.textContent = 'FINAL LEAGUE RANK: #' + state.rankingInfo.userRank + ' OF 64';
+      list.appendChild(d4);
+
+      if(!state.conf.champion && !state.conf.eliminated){
+        confBtn.textContent = state.conf.started ? 'PLAY ' + CONF_ROUND_LABELS[state.conf.round] : 'PLAY CONFERENCE TOURNAMENT';
+        confBtn.classList.remove('hide');
+      } else {
+        const dc = document.createElement('div');
+        dc.className='center'; dc.style.marginTop='6px'; dc.style.fontSize='9px';
+        dc.style.color = state.conf.champion ? 'var(--accent)' : 'var(--text-dim)';
+        dc.textContent = state.conf.champion ? 'CONFERENCE CHAMPIONS!' : 'CONF. TOURNEY: OUT IN ' + CONF_ROUND_LABELS[state.conf.round];
+        list.appendChild(dc);
+
+        if(!isQualified()){
+          const d2 = document.createElement('div');
+          d2.className='center'; d2.style.color='var(--accent2)'; d2.style.fontSize='9px'; d2.style.marginTop='6px';
+          d2.textContent = 'MISSED THE PLAYOFFS - NOT A CONF. CHAMP OR TOP 25';
+          list.appendChild(d2);
+          const grads = state.roster.filter(p=>p.class==='SR').length;
+          goRecruitBtn.textContent = grads > 0 ? 'GO TO RECRUITING' : 'CONTINUE TO NEXT SEASON';
+          goRecruitBtn.classList.remove('hide');
+        } else if(!state.playoffs.champion && !state.playoffs.eliminated){
+          playoffBtn.textContent = state.playoffs.started ? 'PLAY ' + state.playoffs.labels[state.playoffs.round] : (state.conf.champion ? 'ENTER PLAYOFFS (BYE)' : 'ENTER THE PLAYOFFS');
+          playoffBtn.classList.remove('hide');
+        } else {
+          const d3 = document.createElement('div');
+          d3.className='center'; d3.style.marginTop='6px'; d3.style.fontSize='10px';
+          d3.style.color = state.playoffs.champion ? 'var(--accent)' : 'var(--accent2)';
+          d3.textContent = state.playoffs.champion ? 'NATIONAL CHAMPIONS!' : 'ELIMINATED IN ' + state.playoffs.labels[state.playoffs.round];
+          list.appendChild(d3);
+          const grads2 = state.roster.filter(p=>p.class==='SR').length;
+          goRecruitBtn.textContent = grads2 > 0 ? 'GO TO RECRUITING' : 'CONTINUE TO NEXT SEASON';
+          goRecruitBtn.classList.remove('hide');
+        }
+      }
+    }
+    showScreen(hub);
+  }
+
+  function startGame(opp, kind, roundLabel){
+    gs = { poss:0, home:0, away:0, log:[], kind: kind, opp: opp, target: POSSESSIONS, otRound: 0 };
+    const prof = getProfile(opp);
+    const styleTag = prof ? ' (' + prof.style + ')' : '';
+    const tag = roundLabel ? ('  [' + roundLabel + ']') : '';
+    $('matchup').textContent = state.team + '  vs  ' + opp + styleTag + tag;
+    $('scoreHome').textContent='0'; $('scoreAway').textContent='0';
+    $('log').innerHTML='';
+    updatePossInfo();
+    showScreen(gameEl);
+  }
+
+  function startConfGame(){
+    if(!state.conf.started){
+      state.conf.started = true;
+      state.conf.seed = conferenceSeed();
+      state.conf.round = state.conf.seed <= 2 ? 1 : 0;
+      save();
+    }
+    const confMates = CONFERENCES[USER_CONFERENCE];
+    const used = state.conf.usedOpponents.concat(state.schedule.map(g=>g.opp));
+    let pool = confMates.filter(t=>!used.includes(t));
+    if(pool.length===0) pool = confMates;
+    const opp = pool[Math.floor(Math.random()*pool.length)];
+    state.conf.usedOpponents.push(opp);
+    save();
+    startGame(opp, 'conf', CONF_ROUND_LABELS[state.conf.round]);
+  }
+
+  function startNationalGame(){
+    if(!state.playoffs.started){
+      state.playoffs.started = true;
+      state.playoffs.bye = !!state.conf.champion;
+      state.playoffs.labels = state.playoffs.bye ? PLAYOFF_ROUNDS_FULL.slice(1) : PLAYOFF_ROUNDS_FULL.slice();
+      const excluded = state.schedule.map(g=>g.opp).concat(state.conf.usedOpponents);
+      const pool = TEAM_NAMES.filter(t=>!excluded.includes(t));
+      state.playoffs.opponents = shuffle(pool).slice(0, state.playoffs.labels.length);
+      save();
+    }
+    const opp = state.playoffs.opponents[state.playoffs.round];
+    startGame(opp, 'national', state.playoffs.labels[state.playoffs.round]);
+  }
+
+  function updatePossInfo(){
+    const periodLen = gs.otRound>0 ? OT_LENGTH : POSSESSIONS;
+    const periodStart = gs.target - periodLen;
+    const posInPeriod = (gs.poss - periodStart) + 1;
+    const label = gs.otRound>0 ? ('OT' + gs.otRound) : 'POSSESSION';
+    $('possInfo').textContent = label + ' ' + posInPeriod + ' / ' + periodLen;
+  }
+  function logLine(txt){ const d = document.createElement('div'); d.textContent = txt; $('log').prepend(d); }
+
+  function runPossession(playKey){
+    const play = PLAYS[playKey];
+    const bonus = rosterBonus();
+    const made = Math.random() < Math.min(0.92, play.chance + (bonus[playKey]||0));
+    if(made){
+      gs.home += play.pts;
+      logLine('YOU: ' + play.label + ' GOOD (+' + play.pts + ')');
+    } else {
+      logLine('YOU: ' + play.label + ' MISSED');
+    }
+    const oppProf = getProfile(gs.opp);
+    const oppKeys = Object.keys(PLAYS);
+    const weights = oppKeys.map(k => Math.max(0.05, PLAYS[k].chance + (oppProf.mods[k]||0)));
+    const total = weights.reduce((a,b)=>a+b,0);
+    let r = Math.random()*total, acc=0, chosenKey = oppKeys[0];
+    for(let i=0;i<oppKeys.length;i++){ acc+=weights[i]; if(r<=acc){ chosenKey=oppKeys[i]; break; } }
+    const oppPlay = PLAYS[chosenKey];
+    const oppMade = Math.random() < Math.max(0.1, Math.min(0.85, oppPlay.chance + (oppProf.mods[chosenKey]||0) - 0.03));
+    if(oppMade){
+      gs.away += oppPlay.pts;
+      logLine('OPP: ' + oppPlay.label + ' GOOD (+' + oppPlay.pts + ')');
+    } else {
+      logLine('OPP: ' + oppPlay.label + ' MISSED');
+    }
+    gs.poss++;
+    $('scoreHome').textContent = gs.home;
+    $('scoreAway').textContent = gs.away;
+    const periodLen = gs.otRound>0 ? OT_LENGTH : POSSESSIONS;
+    const periodStart = gs.target - periodLen;
+    $('meter').style.width = Math.round(((gs.poss - periodStart)/periodLen)*100) + '%';
+    if(gs.poss >= gs.target){
+      if(gs.home === gs.away){
+        gs.otRound++;
+        gs.target += OT_LENGTH;
+        logLine('END OF ' + (gs.otRound===1 ? 'REGULATION' : ('OT'+(gs.otRound-1))) + ' - TIED ' + gs.home + '-' + gs.away + '. OVERTIME!');
+        updatePossInfo();
+      } else {
+        finishGame();
+      }
+    } else {
+      updatePossInfo();
+    }
+  }
+
+  function finishGame(){
+    const otTag = gs.otRound>0 ? (gs.otRound===1 ? ' (OT)' : ' (' + gs.otRound + 'OT)') : '';
+    if(gs.kind === 'conf'){
+      const won = gs.home >= gs.away;
+      if(won){
+        state.conf.round++;
+        if(state.conf.round >= CONF_ROUND_LABELS.length){ state.conf.champion = true; }
+      } else { state.conf.eliminated = true; }
+      save();
+      $('resultTitle').textContent = (won ? (state.conf.champion ? 'CONFERENCE CHAMPS!' : 'ADVANCE!') : 'TOURNEY OVER') + otTag;
+      $('resultScore').textContent = state.team + ' ' + gs.home + ' - ' + gs.away + ' ' + gs.opp;
+      showScreen(resultEl);
+      return;
+    }
+    if(gs.kind === 'national'){
+      const won = gs.home >= gs.away;
+      if(won){
+        state.playoffs.round++;
+        if(state.playoffs.round >= state.playoffs.labels.length){ state.playoffs.champion = true; }
+      } else { state.playoffs.eliminated = true; }
+      save();
+      $('resultTitle').textContent = (won ? (state.playoffs.champion ? 'CHAMPIONS!' : 'ADVANCE!') : 'ELIMINATED') + otTag;
+      $('resultScore').textContent = state.team + ' ' + gs.home + ' - ' + gs.away + ' ' + gs.opp;
+      showScreen(resultEl);
+      return;
+    }
+    const g = state.schedule[state.current];
+    g.played = true; g.us = gs.home; g.them = gs.away;
+    g.result = gs.home >= gs.away ? 'W' : 'L';
+    if(g.result==='W') state.wins++; else state.losses++;
+    state.current++;
+    save();
+    $('resultTitle').textContent = (g.result==='W' ? 'VICTORY!' : 'TOUGH LOSS') + otTag;
+    $('resultScore').textContent = state.team + ' ' + gs.home + ' - ' + gs.away + ' ' + g.opp;
+    showScreen(resultEl);
+  }
+
+  $('startBtn').addEventListener('click', ()=>{
+    const name = ($('teamName').value || 'YOUR TEAM').toUpperCase().trim();
+    newSeason(name);
+    renderHub();
+  });
+
+  $('playNextBtn').addEventListener('click', ()=> startGame(state.schedule[state.current].opp, 'season', null));
+  $('confBtn').addEventListener('click', startConfGame);
+  $('playoffBtn').addEventListener('click', startNationalGame);
+  $('top25Btn').addEventListener('click', renderTop25);
+  $('top25BackBtn').addEventListener('click', renderHub);
+  $('rosterBtn').addEventListener('click', renderRoster);
+  $('rosterBackBtn').addEventListener('click', renderHub);
+  $('goRecruitBtn').addEventListener('click', advanceOffseason);
+  $('confirmRecruitsBtn').addEventListener('click', ()=>{
+    if(state.selected.length !== state.pendingVacancies) return;
+    const signed = state.selected.map(i=> state.recruits[i]);
+    state.roster = state.roster.concat(signed);
+    state.year++;
+    startNextSeasonKeepingRoster();
+    renderHub();
+  });
+
+  $('resetBtn').addEventListener('click', ()=>{
+    try{ localStorage.removeItem('retroCBB'); }catch(e){}
+    state = null;
+    showScreen(setup);
+  });
+
+  $('continueBtn').addEventListener('click', renderHub);
+
+  $('playButtons').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button[data-play]');
+    if(!btn) return;
+    runPossession(btn.getAttribute('data-play'));
+  });
+
+  if(state){ renderHub(); } else { showScreen(setup); }
+})();
+</script>
+</body>
+</html>
