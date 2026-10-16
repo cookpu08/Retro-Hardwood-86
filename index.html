@@ -187,14 +187,14 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     inside:{label:"INSIDE POST", chance:0.75, pts:2},
     outside:{label:"MID-RANGE", chance:0.60, pts:2},
     three:{label:"LONG BOMB", chance:0.50, pts:3},
-    fast:{label:"FAST BREAK", chance:0.60, pts:2}
+    fast:{label:"FAST BREAK", chance:0.90, pts:2}
   };
-  const POSSESSIONS = 45;
+  const POSSESSIONS = 50o;
   const OT_LENGTH = 10;
 
   const CLASS_ORDER = ['FR','SO','JR','SR'];
   const ARCHETYPE_PRIMARY = {
-    "SHARPSHOOTER": {three:1},
+    "SHARPSHOOTER": {three:10},
     "COURT GENERAL": {outside:1},
     "BALLHAWK": {fast:1},
     "PAINT PRODIGY": {inside:1},
