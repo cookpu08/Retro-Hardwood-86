@@ -162,13 +162,13 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
   };
   const USER_CONFERENCE = "ATLANTIC CONFERENCE";
   const TEAM_NAMES = Object.values(CONFERENCES).flat();
-  const SEASON_GAMES = 31;
+  const SEASON_GAMES = 32;
   const CONF_ROUND_LABELS = ["CONF. QUARTERFINAL", "CONF. SEMIFINAL", "CONF. CHAMPIONSHIP"];
-  const PLAYOFF_ROUNDS_FULL = ["ROUND OF 32", "ROUND OF 16", "QUARTERFINAL", "SEMIFINAL", "CHAMPIONSHIP"];
+  const PLAYOFF_ROUNDS_FULL = ["ROUND OF 32", "Sweet 16", "Elite 8", "Final 4", "NATIONAL CHAMPIONSHIP"];
   const ARCHETYPES = [
     {style:"POST BRUISERS", mods:{inside:0.08, outside:-0.02, three:-0.06, fast:-0.03}},
     {style:"RUN & GUN", mods:{fast:0.10, inside:-0.03, outside:-0.02, three:-0.02}},
-    {style:"SHARPSHOOTERS", mods:{three:0.12, inside:-0.05, outside:0.02, fast:-0.04}},
+    {style:"SHARPSHOOTERS", mods:{three:1, inside:-0.05, outside:0.02, fast:-0.04}},
     {style:"GRIND IT OUT", mods:{outside:0.08, fast:-0.08, inside:0.02, three:-0.03}},
     {style:"BOMB SQUAD", mods:{three:0.15, fast:-0.05, inside:-0.04, outside:-0.03}},
     {style:"BALANCED ATTACK", mods:{inside:0.02, outside:0.02, three:0.02, fast:0.02}},
@@ -184,13 +184,13 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     return { style: arche.style, mods };
   }
   const PLAYS = {
-    inside:{label:"INSIDE POST", chance:0.62, pts:2},
-    outside:{label:"MID-RANGE", chance:0.48, pts:2},
-    three:{label:"LONG BOMB", chance:0.44, pts:3},
-    fast:{label:"FAST BREAK", chance:0.40, pts:2}
+    inside:{label:"INSIDE POST", chance:0.75, pts:2},
+    outside:{label:"MID-RANGE", chance:0.60, pts:2},
+    three:{label:"LONG BOMB", chance:0.50, pts:3},
+    fast:{label:"FAST BREAK", chance:0.60, pts:2}
   };
-  const POSSESSIONS = 20;
-  const OT_LENGTH = 5;
+  const POSSESSIONS = 45;
+  const OT_LENGTH = 10;
 
   const CLASS_ORDER = ['FR','SO','JR','SR'];
   const ARCHETYPE_PRIMARY = {
