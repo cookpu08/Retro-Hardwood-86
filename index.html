@@ -61,6 +61,8 @@ button.danger{ background:var(--accent2); color:#2a0000; border-color:var(--acce
 .meter{ background:#000; border:2px solid var(--line); border-radius:2px; height:16px; margin:8px 0; overflow:hidden; }
 .meter-fill{ height:100%; background:var(--accent); width:0%; transition:width .05s linear; }
 footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px; }
+.dev-up{ color:var(--accent); }
+.dev-down{ color:var(--accent2); }
 </style>
 </head>
 <body>
@@ -83,6 +85,7 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     <button class="primary hide" id="goRecruitBtn">GO TO RECRUITING</button>
     <button class="hide" id="top25Btn">VIEW TOP 25</button>
     <button id="rosterBtn">VIEW ROSTER</button>
+    <button id="statsBtn">VIEW STATS</button>
     <button class="danger" id="resetBtn">RESET SEASON</button>
   </div>
 
@@ -129,6 +132,20 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     <button class="primary" id="continueBtn">CONTINUE SEASON</button>
   </div>
 
+  <div id="devScreen" class="panel hide">
+    <div class="center" style="color:var(--accent);font-size:12px;margin-bottom:4px;">OFFSEASON DEVELOPMENT</div>
+    <div class="center" style="color:var(--text-dim);font-size:8px;margin-bottom:8px;">RATING CHANGES &middot; DRAFT &middot; TRANSFERS</div>
+    <div class="sched" id="devList"></div>
+    <button class="primary" id="devContinueBtn">CONTINUE</button>
+  </div>
+
+  <div id="statsScreen" class="panel hide">
+    <div class="center" style="color:var(--accent);font-size:12px;margin-bottom:4px;">SEASON STATS</div>
+    <div class="center" style="color:var(--text-dim);font-size:8px;margin-bottom:8px;" id="statsRecord"></div>
+    <div class="sched" id="statsList"></div>
+    <button class="primary" id="statsBackBtn">BACK</button>
+  </div>
+
   <footer>tap a play each possession &middot; outcome is weighted by risk &amp; roster</footer>
 </div>
 
@@ -145,7 +162,7 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
   };
   const USER_CONFERENCE = "ATLANTIC CONFERENCE";
   const TEAM_NAMES = Object.values(CONFERENCES).flat();
-  const SEASON_GAMES = 13;
+  const SEASON_GAMES = 31;
   const CONF_ROUND_LABELS = ["CONF. QUARTERFINAL", "CONF. SEMIFINAL", "CONF. CHAMPIONSHIP"];
   const PLAYOFF_ROUNDS_FULL = ["ROUND OF 32", "ROUND OF 16", "QUARTERFINAL", "SEMIFINAL", "CHAMPIONSHIP"];
   const ARCHETYPES = [
@@ -207,7 +224,7 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     const weightLb = Math.round(155 + (heightIn-70)*4 + (Math.random()*30-15));
     const archetype = RECRUIT_ARCHETYPES[Math.floor(Math.random()*RECRUIT_ARCHETYPES.length)];
     const stars = randomStars();
-    return { name, stars, overall: overallRating(stars), heightIn, weightLb, archetype, class:'FR' };
+    return { name, stars, overall: overallRating(stars), heightIn, weightLb, archetype, class:'FR', pts:0, gp:0, source:'HS' };
   }
   function heightStr(inches){ return Math.floor(inches/12) + "'" + (inches%12) + '"'; }
   function starStr(n){ return '\u2605'.repeat(n) + '\u2606'.repeat(5-n); }
@@ -216,7 +233,18 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     for(let i=0;i<5;i++){ const p = randomPlayer(used); p.class='SR'; r.push(p); }
     return r;
   }
-  function generateRecruitClass(){ const used=[]; const r=[]; for(let i=0;i<10;i++){ r.push(randomPlayer(used)); } return r; }
+  function generateRecruitPool(){
+    const used=[]; const pool=[];
+    for(let i=0;i<7;i++){ pool.push(randomPlayer(used)); }
+    for(let i=0;i<5;i++){
+      const p = randomPlayer(used);
+      p.class = Math.random()<0.5 ? 'SO' : 'JR';
+      p.overall = Math.min(99, Math.max(p.overall, overallRating(p.stars) + 8));
+      p.source = 'PORTAL';
+      pool.push(p);
+    }
+    return pool;
+  }
   function rosterBonus(){
     const b = {inside:0, outside:0, three:0, fast:0};
     (state.roster||[]).forEach(p=>{
@@ -227,11 +255,26 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     return b;
   }
 
+  // --- Year-over-year player development ---
+  // Called on a player BEFORE their class is promoted (p.class is their outgoing class).
+  // Younger, higher-star players have more growth potential; there's a small chance
+  // of a breakout leap or a regression (bad offseason / nagging injury).
+  function developPlayer(p){
+    const classIdx = CLASS_ORDER.indexOf(p.class); // FR=0, SO=1, JR=2 (SR graduates, never called)
+    const growthPotential = Math.max(0.3, (3 - classIdx) / 3); // more room to grow when younger
+    const starFactor = 0.5 + p.stars * 0.15; // higher-rated recruits develop faster
+    let delta = Math.round((Math.random() * 8 - 2) * growthPotential * starFactor);
+    const roll = Math.random();
+    if(roll < 0.06){ delta += Math.round(Math.random() * 10) + 5; }      // breakout offseason
+    else if(roll > 0.94){ delta -= Math.round(Math.random() * 8) + 3; }  // regression / injury
+    return Math.max(30, Math.min(99, p.overall + delta));
+  }
+
   let state = load() || null;
   let gs = null;
 
   const $ = id => document.getElementById(id);
-  const setup=$('setup'), hub=$('hub'), gameEl=$('game'), resultEl=$('result'), top25Screen=$('top25Screen'), rosterScreen=$('rosterScreen'), recruitScreen=$('recruitScreen');
+  const setup=$('setup'), hub=$('hub'), gameEl=$('game'), resultEl=$('result'), top25Screen=$('top25Screen'), rosterScreen=$('rosterScreen'), recruitScreen=$('recruitScreen'), devScreen=$('devScreen'), statsScreen=$('statsScreen');
 
   function save(){ try{ localStorage.setItem('retroCBB', JSON.stringify(state)); }catch(e){} }
   function load(){ try{ const r=localStorage.getItem('retroCBB'); return r?JSON.parse(r):null; }catch(e){ return null; } }
@@ -290,7 +333,9 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
       rankingInfo: null,
       conf: { started:false, seed:null, round:0, eliminated:false, champion:false, usedOpponents:[] },
       playoffs: { started:false, round:0, eliminated:false, champion:false, opponents:null, labels:null, bye:false },
-      recruits: null, selected: [], pendingVacancies: 0
+      recruits: null, selected: [], pendingVacancies: 0,
+      devReport: null, draftReport: null, transferReport: null,
+      postWins: 0, postLosses: 0
     };
     save();
   }
@@ -304,17 +349,46 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     state.conf = { started:false, seed:null, round:0, eliminated:false, champion:false, usedOpponents:[] };
     state.playoffs = { started:false, round:0, eliminated:false, champion:false, opponents:null, labels:null, bye:false };
     state.recruits = null; state.selected = []; state.pendingVacancies = 0;
+    state.postWins = 0; state.postLosses = 0;
+    state.roster.forEach(p=>{ p.pts = 0; p.gp = 0; });
     save();
   }
 
   function advanceOffseason(){
-    const staying = state.roster.filter(p=>p.class !== 'SR');
-    const numGrad = state.roster.length - staying.length;
-    const promoted = staying.map(p=> Object.assign({}, p, { class: CLASS_ORDER[CLASS_ORDER.indexOf(p.class)+1] }));
-    state.roster = promoted;
-    state.pendingVacancies = numGrad;
+    const numGrad = state.roster.filter(p=>p.class==='SR').length;
+    const devReport = [], draftReport = [], transferReport = [], remaining = [];
+    state.roster.forEach(p=>{
+      if(p.class === 'SR') return;
+      const newOverall = developPlayer(p);
+      devReport.push({ name: p.name, oldOverall: p.overall, newOverall: newOverall, oldClass: p.class });
+      if(p.class === 'SO'){
+        const declareChance = Math.max(0, (newOverall - 55) / 130);
+        if(Math.random() < declareChance){
+          draftReport.push({ name: p.name, overall: newOverall });
+          return;
+        }
+      }
+      if(Math.random() < 0.07){
+        transferReport.push({ name: p.name, overall: newOverall });
+        return;
+      }
+      remaining.push(Object.assign({}, p, { class: CLASS_ORDER[CLASS_ORDER.indexOf(p.class)+1], overall: newOverall }));
+    });
+    state.roster = remaining;
+    state.pendingVacancies = numGrad + draftReport.length + transferReport.length;
+    state.devReport = devReport;
+    state.draftReport = draftReport;
+    state.transferReport = transferReport;
     save();
-    if(numGrad > 0){
+    if(devReport.length > 0 || draftReport.length > 0 || transferReport.length > 0){
+      renderDevScreen();
+    } else {
+      afterDevelopment();
+    }
+  }
+
+  function afterDevelopment(){
+    if(state.pendingVacancies > 0){
       enterRecruiting();
     } else {
       state.year++;
@@ -323,8 +397,33 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     }
   }
 
+  function renderDevScreen(){
+    const listEl = $('devList');
+    listEl.innerHTML = '';
+    (state.devReport||[]).forEach(d=>{
+      const delta = d.newOverall - d.oldOverall;
+      const sign = delta > 0 ? '+' : '';
+      const cls = delta > 0 ? 'dev-up' : (delta < 0 ? 'dev-down' : '');
+      const div = document.createElement('div');
+      div.className = 'g';
+      div.innerHTML = '<span>'+d.name+'</span><span class="'+cls+'">'+d.oldOverall+' &rarr; '+d.newOverall+' ('+sign+delta+')</span>';
+      listEl.appendChild(div);
+    });
+    (state.draftReport||[]).forEach(d=>{
+      const div = document.createElement('div'); div.className = 'g';
+      div.innerHTML = '<span>'+d.name+'</span><span class="dev-up">DECLARED FOR DRAFT (OVR '+d.overall+')</span>';
+      listEl.appendChild(div);
+    });
+    (state.transferReport||[]).forEach(d=>{
+      const div = document.createElement('div'); div.className = 'g';
+      div.innerHTML = '<span>'+d.name+'</span><span class="dev-down">ENTERED TRANSFER PORTAL</span>';
+      listEl.appendChild(div);
+    });
+    showScreen(devScreen);
+  }
+
   function showScreen(which){
-    [setup,hub,gameEl,resultEl,top25Screen,rosterScreen,recruitScreen].forEach(s=>s.classList.add('hide'));
+    [setup,hub,gameEl,resultEl,top25Screen,rosterScreen,recruitScreen,devScreen,statsScreen].forEach(s=>s.classList.add('hide'));
     which.classList.remove('hide');
   }
 
@@ -364,8 +463,23 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     showScreen(rosterScreen);
   }
 
+  function renderStats(){
+    const listEl = $('statsList');
+    listEl.innerHTML = '';
+    const sorted = state.roster.slice().sort((a,b)=> (b.pts||0)-(a.pts||0));
+    sorted.forEach(p=>{
+      const gp = p.gp||0; const ppg = gp ? (p.pts/gp).toFixed(1) : '0.0';
+      const div = document.createElement('div'); div.className='g';
+      div.innerHTML = '<span>['+p.class+'] '+p.name+'</span><span>'+(p.pts||0)+' PTS &middot; '+ppg+' PPG ('+gp+'GP)</span>';
+      listEl.appendChild(div);
+    });
+    const totalW = state.wins + state.postWins, totalL = state.losses + state.postLosses;
+    $('statsRecord').textContent = 'TOTAL ' + totalW + '-' + totalL + '  (REG ' + state.wins + '-' + state.losses + ' / POST ' + state.postWins + '-' + state.postLosses + ')';
+    showScreen(statsScreen);
+  }
+
   function enterRecruiting(){
-    if(!state.recruits){ state.recruits = generateRecruitClass(); state.selected = []; save(); }
+    if(!state.recruits){ state.recruits = generateRecruitPool(); state.selected = []; save(); }
     renderRecruitScreen();
   }
   function toggleRecruit(i){
@@ -376,7 +490,7 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     renderRecruitScreen();
   }
   function renderRecruitScreen(){
-    $('recruitSub').textContent = state.pendingVacancies + ' SENIOR' + (state.pendingVacancies===1?'':'S') + ' GRADUATED - SIGN ' + state.pendingVacancies + ' OF 10 AS FRESHMEN';
+    $('recruitSub').textContent = state.pendingVacancies + ' VACANC' + (state.pendingVacancies===1?'Y':'IES') + ' - SIGN ' + state.pendingVacancies + ' OF ' + state.recruits.length + ' (HS RECRUITS & TRANSFER PORTAL)';
     const listEl = $('recruitList');
     listEl.innerHTML = '';
     state.recruits.forEach((p,i)=>{
@@ -385,7 +499,8 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
       div.className = 'g';
       div.style.cursor = 'pointer';
       if(picked) div.style.color = 'var(--accent)';
-      div.innerHTML = '<span>'+(picked?'[X] ':'[ ] ')+starStr(p.stars)+' OVR '+p.overall+' '+p.name+'<br>'+p.archetype+' &middot; '+heightStr(p.heightIn)+' '+p.weightLb+'lb</span>';
+      const tag = p.source==='PORTAL' ? ('TRANSFER-'+p.class) : 'HS-FR';
+      div.innerHTML = '<span>'+(picked?'[X] ':'[ ] ')+'['+tag+'] '+starStr(p.stars)+' OVR '+p.overall+' '+p.name+'<br>'+p.archetype+' &middot; '+heightStr(p.heightIn)+' '+p.weightLb+'lb</span>';
       div.addEventListener('click', ()=> toggleRecruit(i));
       listEl.appendChild(div);
     });
@@ -433,6 +548,11 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
       d4.textContent = 'FINAL LEAGUE RANK: #' + state.rankingInfo.userRank + ' OF 64';
       list.appendChild(d4);
 
+      const d5 = document.createElement('div');
+      d5.className='center'; d5.style.color='var(--text-dim)'; d5.style.fontSize='9px'; d5.style.marginTop='2px';
+      d5.textContent = 'TOTAL W/ POSTSEASON: ' + (state.wins+state.postWins) + '-' + (state.losses+state.postLosses);
+      list.appendChild(d5);
+
       if(!state.conf.champion && !state.conf.eliminated){
         confBtn.textContent = state.conf.started ? 'PLAY ' + CONF_ROUND_LABELS[state.conf.round] : 'PLAY CONFERENCE TOURNAMENT';
         confBtn.classList.remove('hide');
@@ -469,8 +589,22 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     showScreen(hub);
   }
 
+  function pickScorer(playKey){
+    const roster = state.roster;
+    if(!roster || !roster.length) return null;
+    const weights = roster.map(p=>{
+      const prim = ARCHETYPE_PRIMARY[p.archetype] || {};
+      const match = prim[playKey] || 0.15;
+      return Math.max(0.05, match*2 + (p.overall/200));
+    });
+    const total = weights.reduce((a,b)=>a+b,0);
+    let r = Math.random()*total, acc=0;
+    for(let i=0;i<roster.length;i++){ acc+=weights[i]; if(r<=acc) return roster[i]; }
+    return roster[roster.length-1];
+  }
+
   function startGame(opp, kind, roundLabel){
-    gs = { poss:0, home:0, away:0, log:[], kind: kind, opp: opp, target: POSSESSIONS, otRound: 0 };
+    gs = { poss:0, home:0, away:0, log:[], kind: kind, opp: opp, target: POSSESSIONS, otRound: 0, scorers: {} };
     const prof = getProfile(opp);
     const styleTag = prof ? ' (' + prof.style + ')' : '';
     const tag = roundLabel ? ('  [' + roundLabel + ']') : '';
@@ -527,7 +661,9 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     const made = Math.random() < Math.min(0.92, play.chance + (bonus[playKey]||0));
     if(made){
       gs.home += play.pts;
-      logLine('YOU: ' + play.label + ' GOOD (+' + play.pts + ')');
+      const scorer = pickScorer(playKey);
+      if(scorer){ gs.scorers[scorer.name] = (gs.scorers[scorer.name]||0) + play.pts; }
+      logLine('YOU: ' + play.label + ' GOOD (+' + play.pts + ')' + (scorer ? ' - ' + scorer.name : ''));
     } else {
       logLine('YOU: ' + play.label + ' MISSED');
     }
@@ -567,12 +703,18 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
 
   function finishGame(){
     const otTag = gs.otRound>0 ? (gs.otRound===1 ? ' (OT)' : ' (' + gs.otRound + 'OT)') : '';
+    state.roster.forEach(p=>{ p.gp = (p.gp||0) + 1; });
+    Object.keys(gs.scorers||{}).forEach(name=>{
+      const player = state.roster.find(p=>p.name===name);
+      if(player){ player.pts = (player.pts||0) + gs.scorers[name]; }
+    });
     if(gs.kind === 'conf'){
       const won = gs.home >= gs.away;
       if(won){
         state.conf.round++;
         if(state.conf.round >= CONF_ROUND_LABELS.length){ state.conf.champion = true; }
-      } else { state.conf.eliminated = true; }
+        state.postWins++;
+      } else { state.conf.eliminated = true; state.postLosses++; }
       save();
       $('resultTitle').textContent = (won ? (state.conf.champion ? 'CONFERENCE CHAMPS!' : 'ADVANCE!') : 'TOURNEY OVER') + otTag;
       $('resultScore').textContent = state.team + ' ' + gs.home + ' - ' + gs.away + ' ' + gs.opp;
@@ -584,7 +726,8 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
       if(won){
         state.playoffs.round++;
         if(state.playoffs.round >= state.playoffs.labels.length){ state.playoffs.champion = true; }
-      } else { state.playoffs.eliminated = true; }
+        state.postWins++;
+      } else { state.playoffs.eliminated = true; state.postLosses++; }
       save();
       $('resultTitle').textContent = (won ? (state.playoffs.champion ? 'CHAMPIONS!' : 'ADVANCE!') : 'ELIMINATED') + otTag;
       $('resultScore').textContent = state.team + ' ' + gs.home + ' - ' + gs.away + ' ' + gs.opp;
@@ -615,7 +758,10 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
   $('top25BackBtn').addEventListener('click', renderHub);
   $('rosterBtn').addEventListener('click', renderRoster);
   $('rosterBackBtn').addEventListener('click', renderHub);
+  $('statsBtn').addEventListener('click', renderStats);
+  $('statsBackBtn').addEventListener('click', renderHub);
   $('goRecruitBtn').addEventListener('click', advanceOffseason);
+  $('devContinueBtn').addEventListener('click', afterDevelopment);
   $('confirmRecruitsBtn').addEventListener('click', ()=>{
     if(state.selected.length !== state.pendingVacancies) return;
     const signed = state.selected.map(i=> state.recruits[i]);
