@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>IXL | Dashboard | Algebra 1 (Grade 9)</title><link rel="icon" type="image/x-icon' href="https://www.ixl.com">
+<title>Retro Basketball Dynasty</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -187,19 +188,15 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     fast:{label:"FAST BREAK", chance:0.60, pts:2}
   };
 
-const POSSESSIONS = 50;
-const OT_LENGTH = 10;
-const FATIGUE_START = 30;
-const FATIGUE_PER_POSS = 0.01;
+  const POSSESSIONS = 50;
+  const OT_LENGTH = 10;
+  const FATIGUE_START = 30;
+  const FATIGUE_PER_POSS = 0.01;
 
-function fatigueFactor(){
-  return Math.max(0, gs.poss - FATIGUE_START) * FATIGUE_PER_POSS;
-const fatigue = fatigueFactor();
-const made = Math.random() < Math.max(0.05, Math.min(0.92, play.chance + (bonus[playKey]||0) - fatigue));=
-const oppMade = Math.random() < Math.max(0.05, Math.min(0.85, oppPlay.chance + (oppProf.mods[chosenKey]||0) - 0.03 - fatigue));
-logLine('YOU: ' + play.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
-logLine('OPP: ' + oppPlay.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
- 
+  function fatigueFactor(){
+    return Math.max(0, gs.poss - FATIGUE_START) * FATIGUE_PER_POSS;
+  }
+
   const CLASS_ORDER = ['FR','SO','JR','SR'];
   const ARCHETYPE_PRIMARY = {
     "SHARPSHOOTER": {three:10},
@@ -264,17 +261,14 @@ logLine('OPP: ' + oppPlay.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
   }
 
   // --- Year-over-year player development ---
-  // Called on a player BEFORE their class is promoted (p.class is their outgoing class).
-  // Younger, higher-star players have more growth potential; there's a small chance
-  // of a breakout leap or a regression (bad offseason / nagging injury).
   function developPlayer(p){
-    const classIdx = CLASS_ORDER.indexOf(p.class); // FR=0, SO=1, JR=2 (SR graduates, never called)
-    const growthPotential = Math.max(0.3, (3 - classIdx) / 3); // more room to grow when younger
-    const starFactor = 0.5 + p.stars * 0.15; // higher-rated recruits develop faster
+    const classIdx = CLASS_ORDER.indexOf(p.class);
+    const growthPotential = Math.max(0.3, (3 - classIdx) / 3);
+    const starFactor = 0.5 + p.stars * 0.15;
     let delta = Math.round((Math.random() * 8 - 2) * growthPotential * starFactor);
     const roll = Math.random();
-    if(roll < 0.06){ delta += Math.round(Math.random() * 10) + 5; }      // breakout offseason
-    else if(roll > 0.94){ delta -= Math.round(Math.random() * 8) + 3; }  // regression / injury
+    if(roll < 0.06){ delta += Math.round(Math.random() * 10) + 5; }
+    else if(roll > 0.94){ delta -= Math.round(Math.random() * 8) + 3; }
     return Math.max(30, Math.min(99, p.overall + delta));
   }
 
@@ -666,14 +660,15 @@ logLine('OPP: ' + oppPlay.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
   function runPossession(playKey){
     const play = PLAYS[playKey];
     const bonus = rosterBonus();
-    const made = Math.random() < Math.min(0.92, play.chance + (bonus[playKey]||0));
+    const fatigue = fatigueFactor();
+    const made = Math.random() < Math.max(0.05, Math.min(0.92, play.chance + (bonus[playKey]||0) - fatigue));
     if(made){
       gs.home += play.pts;
       const scorer = pickScorer(playKey);
       if(scorer){ gs.scorers[scorer.name] = (gs.scorers[scorer.name]||0) + play.pts; }
       logLine('YOU: ' + play.label + ' GOOD (+' + play.pts + ')' + (scorer ? ' - ' + scorer.name : ''));
     } else {
-      logLine('YOU: ' + play.label + ' MISSED');
+      logLine('YOU: ' + play.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
     }
     const oppProf = getProfile(gs.opp);
     const oppKeys = Object.keys(PLAYS);
@@ -682,12 +677,12 @@ logLine('OPP: ' + oppPlay.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
     let r = Math.random()*total, acc=0, chosenKey = oppKeys[0];
     for(let i=0;i<oppKeys.length;i++){ acc+=weights[i]; if(r<=acc){ chosenKey=oppKeys[i]; break; } }
     const oppPlay = PLAYS[chosenKey];
-    const oppMade = Math.random() < Math.max(0.1, Math.min(0.85, oppPlay.chance + (oppProf.mods[chosenKey]||0) - 0.03));
+    const oppMade = Math.random() < Math.max(0.05, Math.min(0.85, oppPlay.chance + (oppProf.mods[chosenKey]||0) - 0.03 - fatigue));
     if(oppMade){
       gs.away += oppPlay.pts;
       logLine('OPP: ' + oppPlay.label + ' GOOD (+' + oppPlay.pts + ')');
     } else {
-      logLine('OPP: ' + oppPlay.label + ' MISSED');
+      logLine('OPP: ' + oppPlay.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
     }
     gs.poss++;
     $('scoreHome').textContent = gs.home;
@@ -796,5 +791,6 @@ logLine('OPP: ' + oppPlay.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
   if(state){ renderHub(); } else { showScreen(setup); }
 })();
 </script>
+</div>
 </body>
 </html>
