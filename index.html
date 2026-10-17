@@ -1,3 +1,179 @@
+
+Continued from
+Game Load Troubleshooting (3)
+SEASON STATS
+TOTAL 1-0 (REG 1-0 / POST 0-0) FG 85% 3P 85% FT --
+[SO] XAVIER CARTER
+108P 2R 1A 2S 1B 1TO 1PF · FG 36/39 3P 36/39 FT 0/0
+108.0 PPG
+40 MIN (1GP)
+[JR] OMAR GRAY
+6P 2R 1A 1S 0B 1TO 0PF · FG 2/3 3P 2/3 FT 0/0
+6.0 PPG
+40 MIN (1GP)
+[JR] TREVOR BENNETT
+3P 4R 4A 2S 1B 0TO 0PF · FG 1/2 3P 1/2 FT 0/0
+3.0 PPG
+40 MIN (1GP)
+[JR] XAVIER FOSTER
+3P 2R 3A 3S 1B 1TO 1PF · FG 1/1 3P 1/1 FT 0/0
+3.0 PPG
+40 MIN (1GP)
+[SO] ISAIAH HUNT
+0P 2R 6A 2S 1B 0TO 0PF · FG 0/2 3P 0/2 FT 0/0
+0.0 PPG
+40 MIN (1GP) from the new file
+…
+BROTHER. 😭😭😭 XAVIER CARTER JUST SCORED 108 POINTS IN ONE GAME.
+
+THE NEW FILE HAS CREATED A COLLEGE BASKETBALL GOD.
+
+XAVIER CARTER · SOPHOMORE
+
+108 POINTS
+40 minutes · 1 game
+
+Field goals
+
+36/39
+92.3%
+
+Three-pointers
+
+36/39
+92.3%
+
+Steals
+
+2
+Turnovers
+
+1
+🚨 The stat line is SNITCHING on the code
+Carter's stats are absurd, but there's a very specific issue here:
+
+36 made field goals + 36 made threes means all 36 field goals were three-pointers. That's mathematically possible.
+
+108 points from 36 threes checks out perfectly.
+
+But the team shooting percentages say FG 85%, 3P 85%, while Carter individually shot 92.3% from both. That can be valid if the team had enough misses from other players, so we'd need to check the totals.
+
+Every player has 40 minutes, which might mean the tracker assigns the full game length to everyone rather than tracking actual minutes played.
+
+The biggest question: did Xavier Carter actually make 36 threes in the play-by-play, or is the new file generating stats independently of what happens in the game?
+
+Because if the stats are tied to real game events, Carter just had the greatest shooting performance in human history. If not, Claude accidentally implemented NBA 2K MyPLAYER on creative mode. 💀
+
+
+Retro Basketball Dynasty.md
+Document
+can you put this is into copiable text?
+YEAHHH 😭 here's the stat line in plain, copyable text, nya~
+
+SEASON STATS
+TOTAL 1-0 (REG 1-0 / POST 0-0)
+FG 85% · 3P 85% · FT --
+
+[SO] XAVIER CARTER
+108P 2R 1A 2S 1B 1TO 1PF · FG 36/39 3P 36/39 FT 0/0
+108.0 PPG
+40 MIN (1GP)
+
+[JR] OMAR GRAY
+6P 2R 1A 1S 0B 1TO 0PF · FG 2/3 3P 2/3 FT 0/0
+6.0 PPG
+40 MIN (1GP)
+
+[JR] TREVOR BENNETT
+3P 4R 4A 2S 1B 0TO 0PF · FG 1/2 3P 1/2 FT 0/0
+3.0 PPG
+40 MIN (1GP)
+
+[JR] XAVIER FOSTER
+3P 2R 3A 3S 1B 1TO 1PF · FG 1/1 3P 1/1 FT 0/0
+3.0 PPG
+40 MIN (1GP)
+
+[SO] ISAIAH HUNT
+0P 2R 6A 2S 1B 0TO 0PF · FG 0/2 3P 0/2 FT 0/0
+0.0 PPG
+40 MIN (1GP)
+
+Copy that straight into Claude and ask it to investigate whether the stats are being calculated from actual game events. Xavier Carter is currently shooting like he unlocked a cheat code. 💀
+
+no the thing I js sent
+OHHH 😭 you mean the actual game file. Here's the uploaded file in copiable text format:
+
+🏀 RETRO BASKETBLL
+64 teams · weekly top 25 · conf. tourney · playoffs · FR-SO-JR-SR recruiting
+
+ENTER YOUR SCHOOL
+
+TOP 25
+
+ROSTER
+
+OFFSEASON RECRUITING
+
+SIGN YOUR CLASS
+
+0 SIGNED
+
+POSSESSION 1 / 20
+
+OFFSEASON DEVELOPMENT
+
+RATING CHANGES · DRAFT · TRANSFERS
+
+SEASON STATS
+
+The uploaded Retro Basketball Dynasty.md only contains those visible text labels, not the full HTML/JavaScript source code of your game. If you want the entire game code in copyable text, upload the actual .html file instead.
+
+
+Retro Basketball Dynasty (1).html
+HTML
+js figured why he dropped 108, it was an old file
+LMAOOO 😭💀 XAVIER CARTER'S 108-POINT GAME WAS A HISTORICAL ARTIFACT FROM AN OLD BUILD.
+
+The new file's stats system actually looks much more grounded in game events: the code awards points and shooting stats when a possession results in a made shot, rather than inventing a separate scoring line.
+
+One thing I spotted in the uploaded HTML, though: every player is credited with playing the full 40 minutes, because the code adds the same 48 seconds to every player on every possession. Also, offensive rebounds are tracked, but defensive rebounds aren't explicitly credited. Those are good fixes to make next.
+
+Your new build is already looking more legit, nya~ 🏀
+
+you should fix those AND give me a copiable code
+
+Worked for 52s
+YEAHHH 😼🏀 I patched the actual HTML file, checked the JavaScript syntax, and made you a copyable version.
+
+Your fixed game files
+Retro Basketball Dynasty — Fixed.html
+
+The complete, playable HTML game.
+
+Get the fixed HTML file
+
+Copyable source code (.txt)
+
+Open this file, select all, and copy the entire code into Claude.
+
+Get the copyable source code
+
+What I fixed
+Offensive rebounds: Now tracked separately as OREB.
+
+Defensive rebounds: Now explicitly credited as DREB, with an event logged when your player gets one.
+
+Rebound stats: Both categories appear in the live tracker and season stats.
+
+Overtime minutes: Corrected the clock so each 10-possession overtime adds five minutes, not eight.
+
+One important clarification: your roster has exactly five players and no substitutions, so all five playing 40 minutes in regulation is actually correct. I fixed the overtime calculation rather than inventing different playing times.
+
+Important: The source code is updated, but your existing saved season in browser storage may still contain old stats. Start a fresh season if you want clean rebound-split statistics from game one.
+
+Nya~ your dynasty has officially received a maintenance patch. 🏀🔧
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,6 +300,8 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
       <button data-play="three">LONG BOMB</button>
       <button data-play="fast">FAST BREAK</button>
     </div>
+    <div class="center vs" id="teamShootLine" style="margin-top:6px;"></div>
+    <div class="sched" id="liveBox" style="margin-top:4px;max-height:130px;"></div>
     <div class="log" id="log"></div>
   </div>
 
@@ -198,6 +376,7 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
   }
 
   const CLASS_ORDER = ['FR','SO','JR','SR'];
+  const STAT_KEYS = ['pts','gp','reb','oreb','dreb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','pf','secs'];
   const ARCHETYPE_PRIMARY = {
     "SHARPSHOOTER": {three:10},
     "COURT GENERAL": {outside:1},
@@ -260,6 +439,60 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     return b;
   }
 
+  // Per-player archetype+OVR shot skill (makes ratings matter on an individual level)
+  function skillBonus(p, playKey){
+    const prim = ARCHETYPE_PRIMARY[p.archetype] || {};
+    const mult = (p.overall||70) / 70;
+    return (prim[playKey]||0) * p.stars * 0.01 * mult;
+  }
+  function teamAvgOverall(){
+    const r = state.roster;
+    return (r && r.length) ? r.reduce((s,p)=>s+(p.overall||60),0)/r.length : 60;
+  }
+  function archetypeCount(name){
+    return (state.roster||[]).filter(p=>p.archetype===name).length;
+  }
+  function weightedPick(list, weightFn){
+    if(!list || !list.length) return null;
+    const weights = list.map(p=>Math.max(0.01, weightFn(p)));
+    const total = weights.reduce((a,b)=>a+b,0);
+    let r = Math.random()*total, acc=0;
+    for(let i=0;i<list.length;i++){ acc+=weights[i]; if(r<=acc) return list[i]; }
+    return list[list.length-1];
+  }
+  function fmtPct(m,a){ return a>0 ? Math.round(m/a*100)+'%' : '--'; }
+  function ensureStatFields(p){
+    STAT_KEYS.forEach(k=>{ if(typeof p[k] !== 'number') p[k] = 0; });
+  }
+  function shootFT(p){
+    p.fta = (p.fta||0)+1;
+    const chance = Math.max(0.35, Math.min(0.95, 0.55 + ((p.overall||60)-50)/200 + (p.archetype==='SHARPSHOOTER'?0.12:0) + (p.archetype==='COURT GENERAL'?0.06:0)));
+    const made = Math.random() < chance;
+    if(made){ p.ftm = (p.ftm||0)+1; p.pts = (p.pts||0)+1; gs.home += 1; }
+    return made;
+  }
+  function updateLiveBox(){
+    const listEl = $('liveBox'); const shootEl = $('teamShootLine');
+    if(!listEl || !shootEl || !gs) return;
+    listEl.innerHTML = '';
+    let fgm=0,fga=0,tpm=0,tpa=0,ftm=0,fta=0,leader=null,leaderPts=-1;
+    state.roster.forEach(p=>{
+      const s0 = (gs.startSnap && gs.startSnap[p.name]) || {};
+      const d = {
+        pts:(p.pts||0)-(s0.pts||0), reb:(p.reb||0)-(s0.reb||0), oreb:(p.oreb||0)-(s0.oreb||0), dreb:(p.dreb||0)-(s0.dreb||0), ast:(p.ast||0)-(s0.ast||0),
+        stl:(p.stl||0)-(s0.stl||0), blk:(p.blk||0)-(s0.blk||0), tov:(p.tov||0)-(s0.tov||0),
+        fgm:(p.fgm||0)-(s0.fgm||0), fga:(p.fga||0)-(s0.fga||0), tpm:(p.tpm||0)-(s0.tpm||0),
+        tpa:(p.tpa||0)-(s0.tpa||0), ftm:(p.ftm||0)-(s0.ftm||0), fta:(p.fta||0)-(s0.fta||0)
+      };
+      fgm+=d.fgm; fga+=d.fga; tpm+=d.tpm; tpa+=d.tpa; ftm+=d.ftm; fta+=d.fta;
+      if(d.pts > leaderPts){ leaderPts = d.pts; leader = p.name; }
+      const div = document.createElement('div'); div.className='g';
+      div.innerHTML = '<span>'+p.name+'</span><span>'+d.pts+'P '+d.reb+'R ('+d.oreb+'O/'+d.dreb+'D) '+d.ast+'A '+d.stl+'S '+d.blk+'B '+d.tov+'TO</span>';
+      listEl.appendChild(div);
+    });
+    shootEl.textContent = 'FG ' + fmtPct(fgm,fga) + ' (' + fgm + '/' + fga + ')  3P ' + fmtPct(tpm,tpa) + '  FT ' + fmtPct(ftm,fta) + '  TOP: ' + (leader||'--') + ' (' + Math.max(0,leaderPts) + ')';
+  }
+
   // --- Year-over-year player development ---
   function developPlayer(p){
     const classIdx = CLASS_ORDER.indexOf(p.class);
@@ -273,6 +506,7 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
   }
 
   let state = load() || null;
+  if(state && state.roster){ state.roster.forEach(ensureStatFields); }
   let gs = null;
 
   const $ = id => document.getElementById(id);
@@ -352,7 +586,7 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     state.playoffs = { started:false, round:0, eliminated:false, champion:false, opponents:null, labels:null, bye:false };
     state.recruits = null; state.selected = []; state.pendingVacancies = 0;
     state.postWins = 0; state.postLosses = 0;
-    state.roster.forEach(p=>{ p.pts = 0; p.gp = 0; });
+    state.roster.forEach(p=>{ STAT_KEYS.forEach(k=>{ p[k]=0; }); });
     save();
   }
 
@@ -469,14 +703,17 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     const listEl = $('statsList');
     listEl.innerHTML = '';
     const sorted = state.roster.slice().sort((a,b)=> (b.pts||0)-(a.pts||0));
+    let tFgm=0,tFga=0,tTpm=0,tTpa=0,tFtm=0,tFta=0;
     sorted.forEach(p=>{
       const gp = p.gp||0; const ppg = gp ? (p.pts/gp).toFixed(1) : '0.0';
+      const min = Math.round((p.secs||0)/60);
+      tFgm+=p.fgm||0; tFga+=p.fga||0; tTpm+=p.tpm||0; tTpa+=p.tpa||0; tFtm+=p.ftm||0; tFta+=p.fta||0;
       const div = document.createElement('div'); div.className='g';
-      div.innerHTML = '<span>['+p.class+'] '+p.name+'</span><span>'+(p.pts||0)+' PTS &middot; '+ppg+' PPG ('+gp+'GP)</span>';
+      div.innerHTML = '<span>['+p.class+'] '+p.name+'<br>'+(p.pts||0)+'P '+(p.reb||0)+'R (O '+(p.oreb||0)+' / D '+(p.dreb||0)+') '+(p.ast||0)+'A '+(p.stl||0)+'S '+(p.blk||0)+'B '+(p.tov||0)+'TO '+(p.pf||0)+'PF &middot; FG '+(p.fgm||0)+'/'+(p.fga||0)+' 3P '+(p.tpm||0)+'/'+(p.tpa||0)+' FT '+(p.ftm||0)+'/'+(p.fta||0)+'</span><span>'+ppg+' PPG<br>'+min+' MIN ('+gp+'GP)</span>';
       listEl.appendChild(div);
     });
     const totalW = state.wins + state.postWins, totalL = state.losses + state.postLosses;
-    $('statsRecord').textContent = 'TOTAL ' + totalW + '-' + totalL + '  (REG ' + state.wins + '-' + state.losses + ' / POST ' + state.postWins + '-' + state.postLosses + ')';
+    $('statsRecord').textContent = 'TOTAL ' + totalW + '-' + totalL + ' (REG ' + state.wins + '-' + state.losses + ' / POST ' + state.postWins + '-' + state.postLosses + ')  FG ' + fmtPct(tFgm,tFga) + ' 3P ' + fmtPct(tTpm,tTpa) + ' FT ' + fmtPct(tFtm,tFta);
     showScreen(statsScreen);
   }
 
@@ -606,7 +843,10 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
   }
 
   function startGame(opp, kind, roundLabel){
-    gs = { poss:0, home:0, away:0, log:[], kind: kind, opp: opp, target: POSSESSIONS, otRound: 0, scorers: {} };
+    gs = { poss:0, home:0, away:0, log:[], kind: kind, opp: opp, target: POSSESSIONS, otRound: 0, secsPerPoss: 2400/POSSESSIONS };
+    state.roster.forEach(ensureStatFields);
+    gs.startSnap = {};
+    state.roster.forEach(p=>{ gs.startSnap[p.name] = { pts:p.pts||0, reb:p.reb||0, oreb:p.oreb||0, dreb:p.dreb||0, ast:p.ast||0, stl:p.stl||0, blk:p.blk||0, tov:p.tov||0, fgm:p.fgm||0, fga:p.fga||0, tpm:p.tpm||0, tpa:p.tpa||0, ftm:p.ftm||0, fta:p.fta||0 }; });
     const prof = getProfile(opp);
     const styleTag = prof ? ' (' + prof.style + ')' : '';
     const tag = roundLabel ? ('  [' + roundLabel + ']') : '';
@@ -614,6 +854,7 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
     $('scoreHome').textContent='0'; $('scoreAway').textContent='0';
     $('log').innerHTML='';
     updatePossInfo();
+    updateLiveBox();
     showScreen(gameEl);
   }
 
@@ -659,34 +900,101 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
 
   function runPossession(playKey){
     const play = PLAYS[playKey];
-    const bonus = rosterBonus();
     const fatigue = fatigueFactor();
-    const made = Math.random() < Math.max(0.05, Math.min(0.92, play.chance + (bonus[playKey]||0) - fatigue));
-    if(made){
-      gs.home += play.pts;
+    const avgOvr = teamAvgOverall();
+
+    const tovChance = Math.max(0.03, Math.min(0.22, 0.09 - archetypeCount('COURT GENERAL')*0.015 - (avgOvr-60)/400 + fatigue*0.5));
+    if(Math.random() < tovChance){
+      const culprit = weightedPick(state.roster, p=> 1.2 - (p.overall||60)/150);
+      if(culprit){ culprit.tov = (culprit.tov||0)+1; }
+      logLine('YOU: TURNOVER' + (culprit ? ' - ' + culprit.name : ''));
+    } else {
       const scorer = pickScorer(playKey);
-      if(scorer){ gs.scorers[scorer.name] = (gs.scorers[scorer.name]||0) + play.pts; }
-      logLine('YOU: ' + play.label + ' GOOD (+' + play.pts + ')' + (scorer ? ' - ' + scorer.name : ''));
-    } else {
-      logLine('YOU: ' + play.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
+      const bonus = rosterBonus();
+      const skill = scorer ? skillBonus(scorer, playKey) : 0;
+      const made = Math.random() < Math.max(0.05, Math.min(0.92, play.chance + skill + (bonus[playKey]||0)*0.4 - fatigue));
+      if(scorer){
+        scorer.fga = (scorer.fga||0)+1;
+        if(playKey==='three'){ scorer.tpa = (scorer.tpa||0)+1; }
+      }
+      if(made){
+        gs.home += play.pts;
+        if(scorer){
+          scorer.pts = (scorer.pts||0) + play.pts;
+          scorer.fgm = (scorer.fgm||0) + 1;
+          if(playKey==='three'){ scorer.tpm = (scorer.tpm||0)+1; }
+        }
+        let assistTxt = '';
+        if(scorer && Math.random() < 0.45){
+          const mates = state.roster.filter(p=>p!==scorer);
+          const passer = mates.length ? weightedPick(mates, p=> (p.archetype==='COURT GENERAL'?1.5:0.3) + (p.overall||60)/150) : null;
+          if(passer){ passer.ast = (passer.ast||0)+1; assistTxt = ' (AST: ' + passer.name + ')'; }
+        }
+        logLine('YOU: ' + play.label + ' GOOD (+' + play.pts + ')' + (scorer ? ' - ' + scorer.name : '') + assistTxt);
+        if(scorer && (playKey==='inside'||playKey==='fast') && Math.random() < 0.12){
+          const m1 = shootFT(scorer);
+          logLine('YOU: AND-1 - ' + scorer.name + ' ' + (m1?'MAKES':'MISSES') + ' THE FT');
+        }
+      } else {
+        logLine('YOU: ' + play.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
+        if(scorer && playKey==='inside' && Math.random() < 0.18){
+          const m1 = shootFT(scorer), m2 = shootFT(scorer);
+          logLine('YOU: SHOOTING FOUL - ' + scorer.name + ' ' + ((m1?1:0)+(m2?1:0)) + '/2 FT');
+        } else {
+          const reb = weightedPick(state.roster, p=> (p.archetype==='PAINT PRODIGY'?1.5:0.4) + (p.overall||60)/150);
+          if(reb && Math.random() < 0.27){ reb.reb = (reb.reb||0)+1; reb.oreb = (reb.oreb||0)+1; logLine('YOU: OFFENSIVE REBOUND - ' + reb.name); }
+        }
+      }
     }
+
     const oppProf = getProfile(gs.opp);
-    const oppKeys = Object.keys(PLAYS);
-    const weights = oppKeys.map(k => Math.max(0.05, PLAYS[k].chance + (oppProf.mods[k]||0)));
-    const total = weights.reduce((a,b)=>a+b,0);
-    let r = Math.random()*total, acc=0, chosenKey = oppKeys[0];
-    for(let i=0;i<oppKeys.length;i++){ acc+=weights[i]; if(r<=acc){ chosenKey=oppKeys[i]; break; } }
-    const oppPlay = PLAYS[chosenKey];
-    const oppMade = Math.random() < Math.max(0.05, Math.min(0.85, oppPlay.chance + (oppProf.mods[chosenKey]||0) - 0.03 - fatigue));
-    if(oppMade){
-      gs.away += oppPlay.pts;
-      logLine('OPP: ' + oppPlay.label + ' GOOD (+' + oppPlay.pts + ')');
+    const oppTovChance = Math.max(0.05, Math.min(0.25, 0.08 + archetypeCount('BALLHAWK')*0.018 + (avgOvr-60)/500));
+    if(Math.random() < oppTovChance){
+      const stealer = weightedPick(state.roster, p=> (p.archetype==='BALLHAWK'?1.6:0.3) + (p.overall||60)/150);
+      if(stealer){ stealer.stl = (stealer.stl||0)+1; }
+      logLine('OPP: TURNOVER' + (stealer ? ' (STOLEN BY ' + stealer.name + ')' : ''));
     } else {
-      logLine('OPP: ' + oppPlay.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
+      const oppKeys = Object.keys(PLAYS);
+      const weights = oppKeys.map(k => Math.max(0.05, PLAYS[k].chance + (oppProf.mods[k]||0)));
+      const total = weights.reduce((a,b)=>a+b,0);
+      let r = Math.random()*total, acc=0, chosenKey = oppKeys[0];
+      for(let i=0;i<oppKeys.length;i++){ acc+=weights[i]; if(r<=acc){ chosenKey=oppKeys[i]; break; } }
+      const oppPlay = PLAYS[chosenKey];
+      const blockChance = Math.max(0, archetypeCount('PAINT PRODIGY')*0.025 + (avgOvr-60)/600);
+      if(Math.random() < blockChance){
+        const blocker = weightedPick(state.roster, p=> (p.archetype==='PAINT PRODIGY'?1.6:0.3) + (p.overall||60)/150);
+        if(blocker){ blocker.blk = (blocker.blk||0)+1; }
+        logLine('OPP: ' + oppPlay.label + ' BLOCKED' + (blocker ? ' BY ' + blocker.name : ''));
+      } else {
+        const oppMade = Math.random() < Math.max(0.05, Math.min(0.85, oppPlay.chance + (oppProf.mods[chosenKey]||0) - 0.03 - fatigue));
+        if(oppMade){
+          gs.away += oppPlay.pts;
+          logLine('OPP: ' + oppPlay.label + ' GOOD (+' + oppPlay.pts + ')');
+          if((chosenKey==='inside'||chosenKey==='fast') && Math.random() < 0.15){
+            gs.away += 1;
+            const fouler = weightedPick(state.roster, p=> (p.archetype==='PAINT PRODIGY'?1.3:0.5) + (100-(p.overall||60))/150);
+            if(fouler){ fouler.pf = (fouler.pf||0)+1; }
+            logLine('OPP: AND-1 CONVERTED' + (fouler ? ' - FOUL ON ' + fouler.name : ''));
+          }
+        } else {
+          logLine('OPP: ' + oppPlay.label + ' MISSED' + (fatigue>0 ? ' (TIRED)' : ''));
+          if(Math.random() < 0.10){
+            const fouler = weightedPick(state.roster, p=> (p.archetype==='PAINT PRODIGY'?1.3:0.5) + (100-(p.overall||60))/150);
+            if(fouler){ fouler.pf = (fouler.pf||0)+1; }
+          }
+          const reb = weightedPick(state.roster, p=> (p.archetype==='PAINT PRODIGY'?1.5:0.4) + (p.overall||60)/150);
+          if(reb && Math.random() < 0.65){ reb.reb = (reb.reb||0)+1; reb.dreb = (reb.dreb||0)+1; logLine('YOU: DEFENSIVE REBOUND - ' + reb.name); }
+        }
+      }
     }
+
     gs.poss++;
+    // Five-player roster, no substitutions: everyone plays the full game. Regulation possessions represent 48 seconds each (40 minutes total); 10-possession overtimes represent five minutes.
+    const secondsThisPoss = gs.otRound > 0 ? (300 / OT_LENGTH) : (2400 / POSSESSIONS);
+    state.roster.forEach(p=>{ p.secs = (p.secs||0) + secondsThisPoss; });
     $('scoreHome').textContent = gs.home;
     $('scoreAway').textContent = gs.away;
+    updateLiveBox();
     const periodLen = gs.otRound>0 ? OT_LENGTH : POSSESSIONS;
     const periodStart = gs.target - periodLen;
     $('meter').style.width = Math.round(((gs.poss - periodStart)/periodLen)*100) + '%';
@@ -707,10 +1015,6 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
   function finishGame(){
     const otTag = gs.otRound>0 ? (gs.otRound===1 ? ' (OT)' : ' (' + gs.otRound + 'OT)') : '';
     state.roster.forEach(p=>{ p.gp = (p.gp||0) + 1; });
-    Object.keys(gs.scorers||{}).forEach(name=>{
-      const player = state.roster.find(p=>p.name===name);
-      if(player){ player.pts = (player.pts||0) + gs.scorers[name]; }
-    });
     if(gs.kind === 'conf'){
       const won = gs.home >= gs.away;
       if(won){
@@ -794,3 +1098,6 @@ footer{ text-align:center; color:var(--text-dim); font-size:8px; margin-top:10px
 </div>
 </body>
 </html>
+
+
+⋮⋮⋮⋮⋮⋮⋮⋮
